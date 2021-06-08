@@ -154,8 +154,7 @@ module.exports = class User extends Model {
   verifyTFA(code) {
     WIKI.logger.info(`users.verifyTFA: Begin verification of Two Factor Auth for User ID: ${this.id}.`)
     let result = tfa.verifyToken(this.tfaSecret, code)
-    v_result = result && _.has(result, 'delta') && result.delta === 0
-    WIKI.logger.info(`users.verifyTFA: Result: ${v_result}.`)
+    WIKI.logger.info(`users.verifyTFA: Result: ${result}.`)
     return (result && _.has(result, 'delta') && result.delta === 0)
   }
 
