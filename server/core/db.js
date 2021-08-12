@@ -236,12 +236,15 @@ module.exports = {
 
     // -> Outbound events handling
 
-    this.listener.addChannel('wiki', payload => {
+    await this.listener.addChannel('wiki', payload => {
+      WIKI.logger.info(`Received event on ${WIKI.INSTANCE_ID} with payload ${payload}`)
+
       if (_.has(payload, 'event') && payload.source !== WIKI.INSTANCE_ID) {
         WIKI.logger.info(`Received event ${payload.event} from instance ${payload.source}: [ OK ]`)
         WIKI.events.inbound.emit(payload.event, payload.value)
       }
     })
+
     WIKI.events.outbound.onAny(this.notifyViaDB)
 
     // -> Listen to inbound events
@@ -257,6 +260,8 @@ module.exports = {
    */
   async unsubscribeToNotifications () {
     if (this.listener) {
+      WIKI.logger.info(`Unsubscribing ${WIKI.INSTANCE_ID} from database notifications`)
+
       WIKI.events.outbound.offAny(this.notifyViaDB)
       WIKI.events.inbound.removeAllListeners()
       this.listener.close()
@@ -269,6 +274,9 @@ module.exports = {
    * @param {object} value Payload of the event
    */
   notifyViaDB (event, value) {
+    WIKI.logger.info(`Attempting to notify for event ${event} with value ${value}`)
+    WIKI.logger.info(`WIKI Instance ID is ${WIKI.INSTANCE_ID}`)
+
     WIKI.models.listener.publish('wiki', {
       source: WIKI.INSTANCE_ID,
       event,
